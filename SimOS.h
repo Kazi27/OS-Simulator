@@ -4,6 +4,9 @@
 #define SIMOS_H //header guards
 #include <string>
 #include <deque>
+#include <iostream>
+
+#include "Process.h"
 
 struct FileReadRequest
 {
@@ -26,7 +29,7 @@ class SimOS
 {
     public:
         //constructor - specify number of hard disks, amount of memory and page size. Disks, frame, and page enumerations start from 0
-        SimOS( int numberOfDisks, unsigned long long amountOfRAM, unsigned int pageSize); 
+        SimOS(int numberOfDisks, unsigned long long amountOfRAM, unsigned int pageSize); 
 
         //create new process inside simulated system, takes place in ready queue or starts using in the cpu
         //every process has a PID and increments by 1, cant reuse PID of terminated process
@@ -78,6 +81,17 @@ class SimOS
 
         //returns I/O-queue of the specified disk starting from the “next to be served” process
         std::deque<FileReadRequest> GetDiskQueue(int diskNumber);
+
+        //own function to get ready queue size just for testing
+        int GetReadyQueueSize();
+    
+    private:
+        // std::deque<int> readyQueue; instead of holding integers, ready queue must hold process objects
+        std::deque<Process> readyQueue;
+        int numberOfDisks;
+        unsigned long long amountOfRAM;
+        unsigned int pageSize;
+        int nextPID = 1; //to keep track of PID
 };
 
 #endif
