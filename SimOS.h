@@ -84,6 +84,9 @@ class SimOS
 
         //own function to get ready queue size just for testing
         int GetReadyQueueSize();
+        
+        //own function to get front of ready queue just for testing
+        Process GetFrontProcess();
     
     private:
         // std::deque<int> readyQueue; instead of holding integers, ready queue must hold process objects
