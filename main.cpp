@@ -12,7 +12,7 @@ int main()
     //testing fork
     //create some initial processes
     int numProcesses = 5;
-    for (int i = 0; i < numProcesses; ++i) {
+    for (int i = 1; i < numProcesses; ++i) {
         sim.NewProcess();
         std::cout << "Number of processes in ready queue: " << sim.GetReadyQueueSize() << std::endl;
     }
@@ -22,7 +22,7 @@ int main()
     {
         Process runningProcess = sim.GetFrontProcess();
         sim.GetReadyQueue().pop_front(); 
-        std::cout << "Simulating process " << runningProcess.getPID() << " running..." << std::endl;
+        std::cout << "process running: " << runningProcess.getPID() << std::endl;
     }
 
     // Now call SimFork to test forking from the "running" process
