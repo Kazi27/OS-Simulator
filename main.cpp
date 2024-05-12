@@ -1,13 +1,14 @@
 //Kazi Sameen Anwar
 
 #include "SimOS.h"
+#include "Process.h"
 #include <iostream>
 
 int main()
 {
     SimOS sim = SimOS(1, 2, 3);
 
-    //testing newprocess() --> go to simOS new process and uncomment
+    // //testing newprocess() --> go to simOS new process and uncomment
 
     //testing fork
     //create some initial processes
@@ -17,19 +18,32 @@ int main()
         std::cout << "Number of processes in ready queue: " << sim.GetReadyQueueSize() << std::endl;
     }
 
-    //Simulate a process "running" by removing it from the front of the queue
-    if (sim.GetReadyQueueSize() != 0) 
+    // //Simulate a process "running" by removing it from the front of the queue
+    // if (sim.GetReadyQueueSize() != 0) 
+    // {
+    //     Process runningProcess = sim.GetFrontProcess();
+    //     sim.GetReadyQueue().pop_front(); 
+    //     std::cout << "process running: " << runningProcess.getPID() << std::endl;
+    // }
+
+    // // Now call SimFork to test forking from the "running" process
+    // sim.SimFork();
+
+    // // Print the ready queue size after the fork
+    // std::cout << "Number of processes in ready queue after fork: " << sim.GetReadyQueueSize() << std::endl;
+
+    for (int i = 0; i < 5; i++) 
     {
-        Process runningProcess = sim.GetFrontProcess();
-        sim.GetReadyQueue().pop_front(); 
-        std::cout << "process running: " << runningProcess.getPID() << std::endl;
+        std::cout << "Timer Interrupt " << i + 1 << std::endl;
+        sim.TimerInterrupt();
+        std::cout << "Ready Queue after Interrupt " << i + 1 << ": ";
+        std::deque<int> queuePIDs = sim.GetReadyQueue();
+        for (int pid : queuePIDs) 
+        {
+            std::cout << pid << " ";
+        }
+        std::cout << std::endl;
     }
 
-    // Now call SimFork to test forking from the "running" process
-    sim.SimFork();
-
-    // Print the ready queue size after the fork
-    std::cout << "Number of processes in ready queue after fork: " << sim.GetReadyQueueSize() << std::endl;
-
-    return 0;
+  return 0;
 }

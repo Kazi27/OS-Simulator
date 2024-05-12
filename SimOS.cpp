@@ -61,16 +61,26 @@ void SimOS::SimExit()
 
     Process exitProcess = readyQueue.front();
     readyQueue.pop_front(); //pop the front of the queue
+    
+    //gotta release memory, use paging -- not done
 }
 
 void SimOS::SimWait()
 {
-    
+    //memory stuff, waiting lmao
 }
 
 void SimOS::TimerInterrupt()
 {
-    
+    if (readyQueue.size() == 0)
+    {
+        return; //no processes in the queue
+    }
+
+    readyQueue.push_back(readyQueue.front()); //running process goes to the back
+    readyQueue.pop_front();
+
+    Process nextProcess = readyQueue.front(); //schedule next process
 }
 
 void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
@@ -96,8 +106,7 @@ int SimOS::GetCPU()
 std::deque<int> SimOS::GetReadyQueue()
 {
     std::deque<int> queuePIDs;
-    for (Process& process : readyQueue) 
-    {
+    for (const Process& process : readyQueue) {
         queuePIDs.push_back(process.getPID());
     }
     return queuePIDs;

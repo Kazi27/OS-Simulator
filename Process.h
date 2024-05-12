@@ -6,15 +6,9 @@
 class Process 
 {
     public:
-        Process(int PID)
-        {
+        Process(int PID);
 
-        }
-
-        int getPID()
-        {
-            return PID;
-        }
+        int getPID() const;
 
     private:
         int PID;
