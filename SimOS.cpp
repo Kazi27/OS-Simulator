@@ -18,7 +18,7 @@ SimOS::SimOS(int numberOfDisks, unsigned long long amountOfRAM, unsigned int pag
 void SimOS::NewProcess()
 {
     int newPID = nextPID++;
-    std::cout << "the PID of this process is " << newPID << std::endl; //uncomment this to check if PID is being updated correctly
+    // std::cout << "the PID of this process is " << newPID << std::endl; //uncomment this to check if PID is being updated correctly
     //need to create a process object so u need a process class so seperate process header file needed
 
     Process newProcess(newPID); //creating new process
@@ -80,7 +80,7 @@ void SimOS::TimerInterrupt()
     readyQueue.push_back(readyQueue.front()); //running process goes to the back
     readyQueue.pop_front();
 
-    Process nextProcess = readyQueue.front(); //schedule next process
+    // Process nextProcess = readyQueue.front(); //schedule next process
 }
 
 void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
@@ -100,7 +100,17 @@ void SimOS::AccessMemoryAddress(unsigned long long address)
 
 int SimOS::GetCPU()
 {
+    // Check if ready queue is empty
+    if (readyQueue.empty()) 
+    {
+        return NO_PROCESS;
+    } 
     
+    else 
+    {
+        // Return the PID of the front process (currently running process)
+        return readyQueue.front().getPID();
+    }
 }
 
 std::deque<int> SimOS::GetReadyQueue()

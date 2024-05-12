@@ -2,7 +2,7 @@
 
 Process::Process(int PID)
 {
-
+    this->PID = PID;
 }
 
 int Process::getPID() const
