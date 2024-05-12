@@ -8,17 +8,17 @@ int main()
 {
     SimOS sim = SimOS(1, 2, 3);
 
-    // //testing newprocess() --> go to simOS new process and uncomment
+    // //testing newprocess() --> go to simOS new process and uncomment it to check
 
     //testing fork
     //create some initial processes
     int numProcesses = 5;
     for (int i = 1; i < numProcesses; ++i) {
         sim.NewProcess();
-        std::cout << "Number of processes in ready queue: " << sim.GetReadyQueueSize() << std::endl;
+        std::cout << "number of processes in ready queue: " << sim.GetReadyQueueSize() << std::endl;
     }
 
-    // //Simulate a process "running" by removing it from the front of the queue
+    // //testing if a process is "running" by removing it from the front of the queue
     // if (sim.GetReadyQueueSize() != 0) 
     // {
     //     Process runningProcess = sim.GetFrontProcess();
@@ -26,12 +26,13 @@ int main()
     //     std::cout << "process running: " << runningProcess.getPID() << std::endl;
     // }
 
-    // // Now call SimFork to test forking from the "running" process
+    // //test forking from "running" process
     // sim.SimFork();
 
-    // // Print the ready queue size after the fork
+    // //check ready queue size after the fork, shoudl be incresed by 1
     // std::cout << "Number of processes in ready queue after fork: " << sim.GetReadyQueueSize() << std::endl;
 
+    //testing interrupt - getting weird numbers
     for (int i = 0; i < 5; i++) 
     {
         std::cout << "Timer Interrupt " << i + 1 << std::endl;
