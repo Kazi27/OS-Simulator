@@ -7,13 +7,8 @@
 #include <iostream>
 
 #include "Process.h"
+#include "Disk.h"
 
-struct FileReadRequest
-{
-    int  PID{0};
-    std::string fileName{""};
-};
- 
 struct MemoryItem
 {
     unsigned long long pageNumber;
@@ -95,6 +90,7 @@ class SimOS
         unsigned long long amountOfRAM;
         unsigned int pageSize;
         int nextPID = 1; //to keep track of PID
+        std::vector<std::deque<FileReadRequest>> diskQueues; // to store disk queues
 };
 
 #endif

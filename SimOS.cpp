@@ -23,6 +23,8 @@ void SimOS::NewProcess()
 
     Process newProcess(newPID); //creating new process
 
+    newProcess.setState(Process::State::New);
+
     readyQueue.push_back(newProcess);
 }
 
@@ -83,9 +85,11 @@ void SimOS::TimerInterrupt()
     // Process nextProcess = readyQueue.front(); //schedule next process
 }
 
+//current process requests to read the file from the disk with a given number
+//process issuing disk reading requests stops using CPU even if ready-queue is empty
 void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 {
-    
+
 }
 
 void SimOS::DiskJobCompleted(int diskNumber)

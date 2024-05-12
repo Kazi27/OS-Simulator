@@ -9,3 +9,13 @@ int Process::getPID() const
 {
     return PID;
 }
+
+Process::State Process::getState() const 
+{ 
+    return state; 
+}
+    
+void Process::setState(State newState) 
+{ 
+    state = newState; 
+}

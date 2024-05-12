@@ -6,6 +6,7 @@
         "string": "cpp",
         "typeinfo": "cpp",
         "vector": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "locale": "cpp"
     }
 }
