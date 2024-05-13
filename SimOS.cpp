@@ -8,46 +8,71 @@ SimOS::SimOS(int numberOfDisks, unsigned long long amountOfRAM, unsigned int pag
     this->amountOfRAM = amountOfRAM;
     this->pageSize = pageSize; //for these the amount depends on the parameter
 
-    int disks = 0;
-    int frame = 0;
-    int pageEnum = 0; //always starts from 0
+    //main specifies total amount of disks so push those into the disk vector
+    for (int i = 0; i < numberOfDisks; i++) 
+    {
+        diskQueue.push_back(Disk()); //still in progress, dont know what disk() does
+    }
 
     // std::cout << numberOfDisks << amountOfRAM << pageSize << disks << frame << pageEnum; //testing
 }
 
 void SimOS::NewProcess()
 {
-    int newPID = nextPID++;
+    // int newPID = nextPID++; old
     // std::cout << "the PID of this process is " << newPID << std::endl; //uncomment this to check if PID is being updated correctly
     //need to create a process object so u need a process class so seperate process header file needed
 
-    Process newProcess(newPID); //creating new process
+    Process newProcess(pidCounter); //creating new process
 
-    newProcess.setState(Process::State::New);
-
-    readyQueue.push_back(newProcess);
-}
-
-int SimOS::GetReadyQueueSize()
-{
-    return readyQueue.size();
-}
-
-void SimOS::SimFork() //the currently running process forks a child so 
-{
-    //first get the currently running process
-    if (readyQueue.size() == 0) //nothing running u return
+    //if the cpu is idle and a new process is created, it can start using the cpu which means state = running and update the current running process variable
+    if (GetCPU() == 0)
     {
-        return;
+        currRunningProcess.setPID(newProcess.getPID()); 
+        //now the new process is running the cpu so change state
+        newProcess.setState(Process::State::Running);
+    }
+    else
+    {
+        //if ur here, cpu is being used and process is ready and willing to use the cpu so push it to ready queue
+        newProcess.setState(Process::State::Ready);
+        readyQueue.push_back(newProcess);
     }
 
-    Process parentProcess = readyQueue.front(); //so now that we have the running process, we need to creat a child process and supply PID
-    std::cout << "parent process PID is " << parentProcess.getPID() << std::endl;
-    int childPID = nextPID++;
-    Process childProcess(childPID);
-    readyQueue.push_back(childProcess); //push child back into the ready queue
-    std::cout << "child process PID is " << childPID << std::endl;
+    //regardless, we need a new PID so increment count
+    pidCounter++;
 }
+
+void SimOS::SimFork()
+{
+    //first check if there is a currently running process because forking needs a currently running rpocess
+    if (GetCPU() == 0)
+    {
+        throw std::logic_error("No process currently running so can't fork");
+    }
+
+    Process parent = currRunningProcess; //inherits state, PID so no need to set those again
+    parent.setState(Process::State::Running); //ask lubna if i should set it to running or not or what state
+    std::cout << "parent PID is " << parent.getPID() << std::endl;
+
+    Process child = Process();
+    child.setState(Process::State::Ready);
+    child.setPID(parent.getPID() + 1);
+    child.setParent(parent);
+
+    parent.setChild(child);
+    std::cout << "child PID is " << child.getPID() << std::endl;
+
+    readyQueue.push_back(child);
+}
+
+//     Process parentProcess = readyQueue.front(); //so now that we have the running process, we need to creat a child process and supply PID
+//     std::cout << "parent process PID is " << parentProcess.getPID() << std::endl;
+//     int childPID = nextPID++;
+//     Process childProcess(childPID);
+//     readyQueue.push_back(childProcess); //push child back into the ready queue
+//     std::cout << "child process PID is " << childPID << std::endl;
+
 
 Process SimOS::GetFrontProcess() //testing 
 {
@@ -102,19 +127,15 @@ void SimOS::AccessMemoryAddress(unsigned long long address)
     
 }
 
+//returns the PID process currently using the CPU which is in the currRunningProcess vairable. If CPU is idle returns NO_PROCESS
 int SimOS::GetCPU()
 {
-    // Check if ready queue is empty
-    if (readyQueue.empty()) 
+    if (currRunningProcess.getPID() == 0) //nobody is using the cpu rn
     {
         return NO_PROCESS;
-    } 
-    
-    else 
-    {
-        // Return the PID of the front process (currently running process)
-        return readyQueue.front().getPID();
     }
+
+    return currRunningProcess.getPID(); //this PID is using the cpu rn
 }
 
 std::deque<int> SimOS::GetReadyQueue()
@@ -139,4 +160,11 @@ FileReadRequest SimOS::GetDisk(int diskNumber)
 std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 {
     
+}
+
+// helper functions
+
+int SimOS::GetReadyQueueSize()
+{
+    return readyQueue.size();
 }

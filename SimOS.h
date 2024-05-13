@@ -9,6 +9,8 @@
 #include "Process.h"
 #include "Disk.h"
 
+//moved struct FileReadRequest to dish.h to avoid redefinition error
+
 struct MemoryItem
 {
     unsigned long long pageNumber;
@@ -83,14 +85,23 @@ class SimOS
         //own function to get front of ready queue just for testing
         Process GetFrontProcess();
     
-    private:
-        // std::deque<int> readyQueue; instead of holding integers, ready queue must hold process objects
-        std::deque<Process> readyQueue;
+    private:  
+        std::deque<Process> readyQueue; //hold all processes in the readyqueue
         int numberOfDisks;
-        unsigned long long amountOfRAM;
-        unsigned int pageSize;
-        int nextPID = 1; //to keep track of PID
-        std::vector<std::deque<FileReadRequest>> diskQueues; // to store disk queues
+        
+        unsigned long long amountOfRAM; //included this for constructor param
+        unsigned int pageSize; //included this for constructor param
+
+        std::vector<Disk> diskQueue; //disk vector
+
+        Process currRunningProcess; //default constructor invoked
+        
+        int pidCounter = 1; //to keep track of PID
+
+        //need memory vector?
+        //unsigned int numPagesAllocated; // each process will have this amount of pages? if u uncomment this add 
+        //numPagesAllocated = amountOfRAM/pageSize; 
+        // the total number of pages allocated for each process (bc we assume each process can use entire RAM) to the cpp file
 };
 
 #endif
