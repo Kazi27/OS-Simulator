@@ -7,8 +7,8 @@
 
 struct FileReadRequest 
 {
-  int PID;
-  std::string fileName;
+  int PID{0};
+  std::string fileName{""};
 };
 
 class Disk 

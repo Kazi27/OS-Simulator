@@ -186,6 +186,7 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
     }
 
     FileReadRequest readRequest = {currRunningProcess.getPID(), fileName};
+    diskQueue[diskNumber].diskReadReq(readRequest, currRunningProcess); //
 
     currRunningProcess.setState(Process::State::Waiting); //is waiting while disk is being read
     currRunningProcess = Process(); //turn into default process to move it to ready qeuue (?)
@@ -202,7 +203,19 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 
 void SimOS::DiskJobCompleted(int diskNumber)
 {
-    
+    Process completedProcess = diskQueue[diskNumber].currProcessReading(); //curr process read gives the process reading the disk rn
+
+    readyQueue.push_back(completedProcess);
+    completedProcess.setState(Process::State::Ready);
+
+    //resume round robin scheduling
+    if (GetReadyQueueSize() != 0) 
+    {
+        // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
+        currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+        currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+        readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+    }
 }
 
 void SimOS::AccessMemoryAddress(unsigned long long address)
@@ -240,15 +253,15 @@ MemoryUsage SimOS::GetMemory()
 
 FileReadRequest SimOS::GetDisk(int diskNumber)
 {
-    
+    return diskQueue[diskNumber].getCurrReq();
 }
 
 std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 {
-
+    return diskQueue[diskNumber].getDiskReadQueue();
 }
 
-//getters
+//helper functions
 
 int SimOS::GetReadyQueueSize()
 {
@@ -262,5 +275,10 @@ Process SimOS::GetFrontProcess()
 
 void SimOS::cascadeTerminate(Process Process)
 {
-
+    if (Process.hasChild() == true) 
+    {
+        cascadeTerminate(Process.getChild()); //recursive call till theres no more children left
+    }
+    
+    Process.setState(Process::State::Terminated); //termination
 }

@@ -10,7 +10,7 @@ void Disk::diskReadReq(FileReadRequest ReadReq, Process Process) //to allow proc
     //first push the requests into disk read queue
     diskReadQueue.push_back(ReadReq);
 
-    if (getDiskReadQueueSize() == 0) //if nobodys in the queue
+    if (currReadReq.PID == 0) //if nobodys in the queue
     {
         currReadProcess = Process; //this process is currently reading
         currReadReq = ReadReq; //currently serving this read request
@@ -26,8 +26,13 @@ Process Disk::currProcessReading() //to find out which process is currently read
         diskReadQueue.pop_front(); //take it out from the queue as it's currently reading anyways
     }
 
-    Disk(); //bring currReadReq back to PID of 0 and intialized to an empty string
     return currReadProcess; 
+    // if (!diskReadQueue.empty()) 
+    // {
+    //     currReadReq = diskReadQueue.front(); // Store the actual request
+    //     diskReadQueue.pop_front(); // Remove it from the queue
+    // }
+    // return currReadProcess;
 }
 
 //getters
