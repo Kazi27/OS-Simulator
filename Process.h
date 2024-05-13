@@ -14,7 +14,7 @@ class Process
 
         Process(int PID);
 
-
+        //getters and setters
 
         int getPID() const;
 

@@ -73,12 +73,6 @@ void SimOS::SimFork()
 //     readyQueue.push_back(childProcess); //push child back into the ready queue
 //     std::cout << "child process PID is " << childPID << std::endl;
 
-
-Process SimOS::GetFrontProcess() //testing 
-{
-  return readyQueue.front();
-}
-
 void SimOS::SimExit()
 {
     if (readyQueue.size() == 0) //nothing running u return
@@ -167,4 +161,9 @@ std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 int SimOS::GetReadyQueueSize()
 {
     return readyQueue.size();
+}
+
+Process SimOS::GetFrontProcess() //testing 
+{
+  return readyQueue.front();
 }
