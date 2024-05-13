@@ -131,14 +131,14 @@ void SimOS::SimWait()
 
         //do we do cascading termination?
         //erase from ram along with all its children
-        // cascadeTerminate(currRunningProcess);
+        cascadeTerminate(currRunningProcess);
     }
 
     else if ((currRunningProcess.hasChild() == true) && (currRunningProcess.getState() != Process::State::Waiting)) //process DOES have a child and did NOT call wait
     {
         //instead of the else if above should i do this to directly know if the child is a zombie or not
-        else if (currRunningProcess.getChild().getState() == Process::State::Zombie)
-        { }
+        // else if (currRunningProcess.getChild().getState() == Process::State::Zombie)
+        // { }
 
         //if you are here, process has a child and is not waiting so process has a zombie child
         //in this case, process keeps using the cpu 
@@ -185,7 +185,7 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
         throw std::logic_error("Invalid disk number so can't read disk");
     }
 
-    //not done yet
+    FileReadRequest readRequest = {currRunningProcess.getPID(), fileName};
 
     currRunningProcess.setState(Process::State::Waiting); //is waiting while disk is being read
     currRunningProcess = Process(); //turn into default process to move it to ready qeuue (?)
@@ -245,7 +245,7 @@ FileReadRequest SimOS::GetDisk(int diskNumber)
 
 std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 {
-    
+
 }
 
 //getters
@@ -258,4 +258,9 @@ int SimOS::GetReadyQueueSize()
 Process SimOS::GetFrontProcess()
 {
   return readyQueue.front();
+}
+
+void SimOS::cascadeTerminate(Process Process)
+{
+
 }

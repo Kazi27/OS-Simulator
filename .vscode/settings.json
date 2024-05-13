@@ -7,6 +7,11 @@
         "typeinfo": "cpp",
         "vector": "cpp",
         "iostream": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "__split_buffer": "cpp",
+        "memory_resource": "cpp",
+        "ios": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp"
     }
 }

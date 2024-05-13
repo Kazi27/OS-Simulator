@@ -43,9 +43,9 @@ void Process::setPID(int PID)
     pid = PID; 
 }
     
-void Process::setState(State newState) 
+void Process::setState(State NewState) 
 { 
-    state = newState; 
+    state = NewState; 
 }
 
 void Process::setParent(Process Parent) 

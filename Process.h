@@ -26,7 +26,7 @@ class Process
 
         void setPID(int PID);
         
-        void setState(State newState);
+        void setState(State NewState);
 
         void setParent(Process Parent);
 
