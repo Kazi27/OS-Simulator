@@ -20,6 +20,10 @@ class Process
 
         State getState() const;
 
+        Process getParent() const;
+
+        Process getChild() const;
+
         void setPID(int PID);
         
         void setState(State newState);
@@ -27,6 +31,10 @@ class Process
         void setParent(Process Parent);
 
         void setChild(Process Child);
+
+        bool hasParent() const; //simexit
+
+        bool hasChild() const; //simwait
 
     private:
         int pid;

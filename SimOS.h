@@ -79,11 +79,15 @@ class SimOS
         //returns I/O-queue of the specified disk starting from the “next to be served” process
         std::deque<FileReadRequest> GetDiskQueue(int diskNumber);
 
-        //own function to get ready queue size just for testing
+        //helper function to get ready queue size
         int GetReadyQueueSize();
         
-        //own function to get front of ready queue just for testing
+        //helper function to get front of ready queue
         Process GetFrontProcess();
+
+        //helper function to erase process along with its children from ram
+        void cascadeTerminate(Process Process);
+
     
     private:  
         std::deque<Process> readyQueue; //hold all processes in the readyqueue

@@ -28,6 +28,16 @@ Process::State Process::getState() const
     return state; 
 }
 
+Process Process::getParent() const 
+{ 
+    return *parent; 
+}
+
+Process Process::getChild() const 
+{ 
+    return *child; 
+}
+
 void Process::setPID(int PID) 
 { 
     pid = PID; 
@@ -46,4 +56,30 @@ void Process::setParent(Process Parent)
 void Process::setChild(Process Child) 
 { 
     this->child = &Child; 
+}
+
+bool Process::hasParent() const //simexit
+{ 
+    if (parent == nullptr)
+    {
+        return false;
+    } 
+
+    if (parent != nullptr)
+    {
+        return true;
+    } 
+}
+
+bool Process::hasChild() const //simwait
+{ 
+    if (child == nullptr)
+    {
+        return false;
+    } 
+
+    if (child != nullptr)
+    {
+        return true;
+    } 
 }

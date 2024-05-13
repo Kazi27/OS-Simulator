@@ -52,7 +52,7 @@ void SimOS::SimFork()
     }
 
     Process parent = currRunningProcess; //inherits state, PID so no need to set those again
-    parent.setState(Process::State::Running); //ask lubna if i should set it to running or not or what state
+    parent.setState(Process::State::Running); 
     std::cout << "parent PID is " << parent.getPID() << std::endl;
 
     Process child = Process();
@@ -66,49 +66,138 @@ void SimOS::SimFork()
     readyQueue.push_back(child);
 }
 
-//     Process parentProcess = readyQueue.front(); //so now that we have the running process, we need to creat a child process and supply PID
-//     std::cout << "parent process PID is " << parentProcess.getPID() << std::endl;
-//     int childPID = nextPID++;
-//     Process childProcess(childPID);
-//     readyQueue.push_back(childProcess); //push child back into the ready queue
-//     std::cout << "child process PID is " << childPID << std::endl;
-
+//process currently using cpu terminates, release memory used by process.
+//if parent waiting, process terminates immediately and parent becomes runnable aka goes to ready queue
+//if parent hasnt called wait yet process turns into a zombie
+//cascading termination for no orphans, if a process terminates all descendants terminate with it
 void SimOS::SimExit()
 {
-    if (readyQueue.size() == 0) //nothing running u return
+    //first check if there is a currently running process because exiting needs a currently running rpocess
+    if (GetCPU() == 0)
     {
-        return;
+        throw std::logic_error("No process currently running so nothing to exit");
     }
 
-    Process exitProcess = readyQueue.front();
-    readyQueue.pop_front(); //pop the front of the queue
-    
-    //gotta release memory, use paging -- not done
+    if (currRunningProcess.hasParent() == false) //process does NOT have a parent
+    {
+        //erase from ram along with all its children
+        cascadeTerminate(currRunningProcess);
+    }
+
+    else if ((currRunningProcess.hasParent() == true) && (currRunningProcess.getParent().getState() == Process::State::Waiting)) //process DOES have a parent and parent process DID called wait
+    {
+        currRunningProcess.getParent().setState(Process::State::Ready); //the parent process that did call wait, is now ready and willing to use the cpu
+
+        readyQueue.push_back(currRunningProcess.getParent()); //now that its in the ready state, push it back to the ready queue
+
+        //erase from ram along with all its children
+        cascadeTerminate(currRunningProcess);
+    }
+
+    else //process DOES have a parent and parent process did NOT call wait
+    {
+        currRunningProcess.setState(Process::State::Zombie); //if parent process didnt call wait it turns into a zombie
+
+        //erase from ram along with all its children
+        cascadeTerminate(currRunningProcess);
+    }
+
+    currRunningProcess = Process(); //turn into default process to move it to ready qeuue (?)
+
+    if (GetReadyQueueSize() != 0) 
+    {
+        // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
+        currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+        currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+        readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+    }
 }
 
+//process waits for any of its child to terminate, once wait is over process goes to end of ready queue or cpu
+//if zombie child exists process keeps using the cpu
+//if more than one zombie child exists process uses any of them to immediately resume parent while other zombies keep waiting for next wait from parent
 void SimOS::SimWait()
 {
-    //memory stuff, waiting lmao
+    //first check if there is a currently running process because waiting needs a currently running process
+    if (GetCPU() == 0)
+    {
+        throw std::logic_error("No process currently running so nothing to wait");
+    }
+    
+    if (currRunningProcess.hasChild() == false) //process does NOT have a child
+    {
+        //what do you do if process does not have a child? do u go to the end of the ready queue or start using cpu? 
+        //or do you let readyQueue.front use the cpu no?
+
+        //do we do cascading termination?
+        //erase from ram along with all its children
+        // cascadeTerminate(currRunningProcess);
+    }
+
+    else if ((currRunningProcess.hasChild() == true) && (currRunningProcess.getState() != Process::State::Waiting)) //process DOES have a child and did NOT call wait
+    {
+        //instead of the else if above should i do this to directly know if the child is a zombie or not
+        else if (currRunningProcess.getChild().getState() == Process::State::Zombie)
+        { }
+
+        //if you are here, process has a child and is not waiting so process has a zombie child
+        //in this case, process keeps using the cpu 
+
+        currRunningProcess.setState(Process::State::Running);
+
+        //erase from ram along with all its children
+        cascadeTerminate(currRunningProcess);
+    }
+
+    //how do u implement this line:
+    //if more than one zombie child exists process uses any of them to immediately resume parent while other zombies keep waiting for next wait from parent
 }
 
 void SimOS::TimerInterrupt()
 {
-    if (readyQueue.size() == 0)
+    //first check if there is a currently running process because you cant signal time slice to be over without a process running rn
+    if (GetCPU() == 0)
     {
-        return; //no processes in the queue
+        throw std::logic_error("No process currently running so timer interrupt can't signal time slice to be over");
     }
-
-    readyQueue.push_back(readyQueue.front()); //running process goes to the back
-    readyQueue.pop_front();
-
-    // Process nextProcess = readyQueue.front(); //schedule next process
+    
+    if (GetReadyQueueSize() != 0) 
+    {
+        readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue
+        currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+        currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+        readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+    }
 }
 
 //current process requests to read the file from the disk with a given number
 //process issuing disk reading requests stops using CPU even if ready-queue is empty
 void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 {
+    //first check if there is a currently running process because disk reading needs a currently running rpocess
+    if (GetCPU() == 0)
+    {
+        throw std::logic_error("No process currently running so cannot request to read the file from the disk");
+    }
 
+    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    {
+        throw std::logic_error("Invalid disk number so can't read disk");
+    }
+
+    //not done yet
+
+    currRunningProcess.setState(Process::State::Waiting); //is waiting while disk is being read
+    currRunningProcess = Process(); //turn into default process to move it to ready qeuue (?)
+
+    //resume round robin scheduling
+    if (GetReadyQueueSize() != 0) 
+    {
+        // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
+        currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+        currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+        readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+    }
 }
 
 void SimOS::DiskJobCompleted(int diskNumber)
@@ -134,11 +223,14 @@ int SimOS::GetCPU()
 
 std::deque<int> SimOS::GetReadyQueue()
 {
-    std::deque<int> queuePIDs;
-    for (const Process& process : readyQueue) {
-        queuePIDs.push_back(process.getPID());
+    std::deque<int> readyQPIDs; //pids are ints
+
+    for (int i = 0; i < GetReadyQueueSize(); ++i) 
+    {
+        readyQPIDs.push_back(readyQueue[i].getPID()); //extract pids from all the process objects and push it into the ready queue pid of ints
     }
-    return queuePIDs;
+
+    return readyQPIDs;
 }
 
 MemoryUsage SimOS::GetMemory()
@@ -156,14 +248,14 @@ std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
     
 }
 
-// helper functions
+//getters
 
 int SimOS::GetReadyQueueSize()
 {
     return readyQueue.size();
 }
 
-Process SimOS::GetFrontProcess() //testing 
+Process SimOS::GetFrontProcess()
 {
   return readyQueue.front();
 }
