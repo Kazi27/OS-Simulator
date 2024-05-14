@@ -2,6 +2,7 @@
 
 #ifndef SIMOS_H
 #define SIMOS_H //header guards
+#include <vector>
 #include <string>
 #include <deque>
 #include <iostream>
@@ -94,7 +95,7 @@ class SimOS
         int numberOfDisks;
         
         unsigned long long amountOfRAM; //included this for constructor param
-        unsigned int pageSize; //included this for constructor param
+        unsigned int pageSize = 0; //included this for constructor param
         
         unsigned long long totalFrames;
         MemoryUsage memory;
