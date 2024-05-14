@@ -229,7 +229,7 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
         throw std::logic_error("No process currently running so cannot request to read the file from the disk");
     }
 
-    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
         throw std::out_of_range("Invalid disk number so can't read disk"); //change from logic error to out of range error as per specs
     }
@@ -252,7 +252,7 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 
 void SimOS::DiskJobCompleted(int diskNumber)
 {
-    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
         throw std::out_of_range("Invalid disk number so can't complete disk job"); //change from logic error to out of range error as per specs
     }
@@ -349,9 +349,9 @@ MemoryUsage SimOS::GetMemory()
 
 FileReadRequest SimOS::GetDisk(int diskNumber)
 {
-    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
-        throw std::out_of_range("Invalid disk number so can't read disk"); //change from logic error to out of range error as per specs
+        throw std::out_of_range("Invalid disk number so can't get disk"); //change from logic error to out of range error as per specs
     }
 
     return diskQueue[diskNumber].getCurrReq();
@@ -359,11 +359,11 @@ FileReadRequest SimOS::GetDisk(int diskNumber)
 
 std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 {
-    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
-        throw std::out_of_range("Invalid disk number so can't read disk"); //change from logic error to out of range error as per specs
+        throw std::out_of_range("Invalid disk number so can't get disk queue"); //change from logic error to out of range error as per specs
     }
-    
+
     return diskQueue[diskNumber].getDiskReadQueue();
 }
 
