@@ -292,15 +292,15 @@ void SimOS::AccessMemoryAddress(unsigned long long address)
 
     //we need to check if the page is already in memory
     bool pageFound = false;
-    for (auto it = memory.begin(); it != memory.end(); ++it) 
+    for (auto iterator = memory.begin(); iterator != memory.end(); ++iterator) //auto for iterator type, starts pointing at first item and increments till the very end item
     {
-        if (it->pageNumber == pageNumber && it->PID == pid) //if the iterator's pagenumber and pid matches ours then enter
+        if (iterator->pageNumber == pageNumber && iterator->PID == pid) //if the iterator's pagenumber and pid matches ours then enter
         {
             pageFound = true; //if ur here we found the page so first set it to true
             
-            MemoryItem item = *it; //create a copy of the memory item, store it in "item"
+            MemoryItem item = *iterator; //create a copy of the memory item, store it in "item"
             
-            memory.erase(it); //remove it from its current position
+            memory.erase(iterator); //remove it from its current position
             
             memory.push_back(item); //push it in the back -- this is basically updating the recently used info as the most recent page is always pushed back, aka move to the end
             
@@ -377,4 +377,16 @@ void SimOS::cascadeTerminate(Process Process)
     }
     
     Process.setState(Process::State::Terminated); //termination
+
+    for (auto iterator = memory.begin(); iterator != memory.end();) //auto for type, iterator points to the first of the memory till it equals the end item in memory
+    {
+        if (iterator->PID == Process.getPID()) //-> to acces the pid of the item the iterator is currently pointing to and if its equal to the pid of the process we are terminating then...
+        {
+            iterator = memory.erase(iterator); //remove the item from memory
+        }
+        else
+        {
+            ++iterator; //if ur here the PIDs did not match so increment the iterator onto the next memory item
+        }
+    }
 }
