@@ -20,7 +20,7 @@ class Disk
 
         Process currProcessReading(); //to find out which process is currently reading
 
-        //getters
+        //getters and setters
 
         std::deque<FileReadRequest> getDiskReadQueue();
 
@@ -28,9 +28,12 @@ class Disk
 
         int getDiskReadQueueSize();
 
+        void setNextRequest();
+
     private:
         FileReadRequest currReadReq;
         std::deque<FileReadRequest> diskReadQueue;
+        std::deque<Process> processQueue; //track the processes associated with the requests
         Process currReadProcess;
 };
 

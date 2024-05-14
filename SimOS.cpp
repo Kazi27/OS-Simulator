@@ -73,6 +73,7 @@ void SimOS::SimFork()
 void SimOS::SimExit()
 {
     //first check if there is a currently running process because exiting needs a currently running rpocess
+    //if (currRunningProcess.getPID() == 0)
     if (GetCPU() == 0)
     {
         throw std::logic_error("No process currently running so nothing to exit");
@@ -104,6 +105,7 @@ void SimOS::SimExit()
 
     currRunningProcess = Process(); //turn into default process to move it to ready qeuue (?)
 
+    //if (!readyQueue.empty())
     if (GetReadyQueueSize() != 0) 
     {
         // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
@@ -131,7 +133,10 @@ void SimOS::SimWait()
 
         //do we do cascading termination?
         //erase from ram along with all its children
-        cascadeTerminate(currRunningProcess);
+        //cascadeTerminate(currRunningProcess);
+
+        //if process does not have a child it doesnt need to wait for anything and goes back to the ready queue but for now just
+        return;
     }
 
     else if ((currRunningProcess.hasChild() == true) && (currRunningProcess.getState() != Process::State::Waiting)) //process DOES have a child and did NOT call wait
@@ -203,13 +208,20 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 
 void SimOS::DiskJobCompleted(int diskNumber)
 {
+    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    {
+        throw std::logic_error("Invalid disk number so can't complete disk job");
+    }
+
     Process completedProcess = diskQueue[diskNumber].currProcessReading(); //curr process read gives the process reading the disk rn
 
-    readyQueue.push_back(completedProcess);
     completedProcess.setState(Process::State::Ready);
+    readyQueue.push_back(completedProcess);
+
+    diskQueue[diskNumber].setNextRequest(); //set next request for the disk
 
     //resume round robin scheduling
-    if (GetReadyQueueSize() != 0) 
+    if (!readyQueue.empty()) 
     {
         // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
         currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
