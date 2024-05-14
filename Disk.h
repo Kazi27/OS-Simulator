@@ -1,3 +1,5 @@
+//Kazi Sameen Anwar
+
 #ifndef DISK_H
 #define DISK_H
 

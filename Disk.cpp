@@ -1,3 +1,5 @@
+//Kazi Sameen Anwar
+
 #include "Disk.h"
 
 Disk::Disk() //to initialize current request
