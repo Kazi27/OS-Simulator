@@ -224,10 +224,10 @@ void SimOS::TimerInterrupt()
 void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 {
     //first check if there is a currently running process because disk reading needs a currently running rpocess
-    // if (GetCPU() == 0)
-    // {
-    //     throw std::logic_error("No process currently running so cannot request to read the file from the disk");
-    // }
+    if (GetCPU() == 0)
+    {
+        throw std::logic_error("No process currently running so cannot request to read the file from the disk");
+    }
 
     if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
@@ -281,10 +281,10 @@ void SimOS::DiskJobCompleted(int diskNumber)
 //if page is not in memory, it loads it and if its full, it replaces the leased recently used page with it
 void SimOS::AccessMemoryAddress(unsigned long long address)
 {
-    // if (GetCPU() == NO_PROCESS) 
-    // {
-    //     throw std::logic_error("No process currently running so cannot access memory");
-    // }
+    if (GetCPU() == NO_PROCESS) 
+    {
+        throw std::logic_error("No process currently running so cannot access memory");
+    }
 
     unsigned long long pageNumber = address / pageSize; //get page number
     
@@ -327,10 +327,7 @@ int SimOS::GetCPU()
         return NO_PROCESS;
     }
 
-    else 
-    {
-        return currRunningProcess.getPID(); //this PID is using the cpu rn
-    }
+    return currRunningProcess.getPID(); //this PID is using the cpu rn
 }
 
 std::deque<int> SimOS::GetReadyQueue()
@@ -352,7 +349,7 @@ MemoryUsage SimOS::GetMemory()
 
 FileReadRequest SimOS::GetDisk(int diskNumber)
 {
-    if ((diskNumber >= numberOfDisks)) //|| (diskNumber < 0))
+    if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
         throw std::out_of_range("Invalid disk number so can't get disk"); //change from logic error to out of range error as per specs
     }
@@ -362,7 +359,7 @@ FileReadRequest SimOS::GetDisk(int diskNumber)
 
 std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 {
-    if ((diskNumber >= numberOfDisks))// || (diskNumber < 0))
+    if ((diskNumber >= numberOfDisks) || (diskNumber < 0))
     {
         throw std::out_of_range("Invalid disk number so can't get disk queue"); //change from logic error to out of range error as per specs
     }

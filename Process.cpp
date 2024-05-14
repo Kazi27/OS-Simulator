@@ -76,7 +76,7 @@ bool Process::hasParent() const //simexit
     // {
     //     return true;
     // } 
-    return parent != nullptr;
+    return parent != nullptr; //does same thing as above except this resolves the warning: on-void function does not return a value in all control paths 
 }
 
 bool Process::hasChild() const //simwait
@@ -90,5 +90,5 @@ bool Process::hasChild() const //simwait
     // {
     //     return true;
     // } 
-    return child != nullptr;
+    return child != nullptr; //does same thing as above except this resolves the warning: on-void function does not return a value in all control paths 
 }
