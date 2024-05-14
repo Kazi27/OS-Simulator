@@ -11,8 +11,10 @@ SimOS::SimOS(int numberOfDisks, unsigned long long amountOfRAM, unsigned int pag
     //main specifies total amount of disks so push those into the disk vector
     for (int i = 0; i < numberOfDisks; i++) 
     {
-        diskQueue.push_back(Disk()); //still in progress, dont know what disk() does
+        diskQueue.push_back(Disk());
     }
+
+    totalFrames = amountOfRAM / pageSize; //calculate total amount of frames
 
     // std::cout << numberOfDisks << amountOfRAM << pageSize << disks << frame << pageEnum; //testing
 }
@@ -53,7 +55,6 @@ void SimOS::SimFork()
 
     Process parent = currRunningProcess; //inherits state, PID so no need to set those again
     parent.setState(Process::State::Running); 
-    std::cout << "parent PID is " << parent.getPID() << std::endl;
 
     Process child = Process();
     child.setState(Process::State::Ready);
@@ -61,7 +62,7 @@ void SimOS::SimFork()
     child.setParent(parent);
 
     parent.setChild(child);
-    std::cout << "child PID is " << child.getPID() << std::endl;
+    //std::cout << "child PID is " << child.getPID() << std::endl;
 
     readyQueue.push_back(child);
 }
@@ -72,7 +73,7 @@ void SimOS::SimFork()
 //cascading termination for no orphans, if a process terminates all descendants terminate with it
 void SimOS::SimExit()
 {
-    //first check if there is a currently running process because exiting needs a currently running rpocess
+    //first check if there is a currently running process because exiting needs a currently running process
     //if (currRunningProcess.getPID() == 0)
     if (GetCPU() == 0)
     {
@@ -83,6 +84,17 @@ void SimOS::SimExit()
     {
         //erase from ram along with all its children
         cascadeTerminate(currRunningProcess);
+
+        //round robin scheduling
+        currRunningProcess = Process(); //turn into default process to indicate no process currently running, cpu is idle
+
+        if (GetReadyQueueSize() != 0) 
+        {
+            // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- -- we don't do this because process is terminated, no need to go back to ready queue
+            currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+            currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+            readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+        }
     }
 
     else if ((currRunningProcess.hasParent() == true) && (currRunningProcess.getParent().getState() == Process::State::Waiting)) //process DOES have a parent and parent process DID called wait
@@ -93,6 +105,17 @@ void SimOS::SimExit()
 
         //erase from ram along with all its children
         cascadeTerminate(currRunningProcess);
+        
+        //round robin scheduling
+        currRunningProcess = Process(); //turn into default process to indicate no process currently running, cpu is idle
+
+        if (GetReadyQueueSize() != 0) 
+        {
+            // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this because process is terminated, no need to go back to ready queue
+            currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+            currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+            readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+        }
     }
 
     else //process DOES have a parent and parent process did NOT call wait
@@ -101,17 +124,17 @@ void SimOS::SimExit()
 
         //erase from ram along with all its children
         cascadeTerminate(currRunningProcess);
-    }
+        
+        //round robin scheduling
+        currRunningProcess = Process(); //turn into default process to indicate no process currently running, cpu is idle
 
-    currRunningProcess = Process(); //turn into default process to move it to ready qeuue (?)
-
-    //if (!readyQueue.empty())
-    if (GetReadyQueueSize() != 0) 
-    {
-        // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
-        currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
-        currRunningProcess.setState(Process::State::Running); //now this is running the cpu
-        readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+        if (GetReadyQueueSize() != 0) 
+        {
+            // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this because process is terminated, no need to go back to ready queue
+            currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+            currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+            readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+        }
     }
 }
 
@@ -128,34 +151,55 @@ void SimOS::SimWait()
     
     if (currRunningProcess.hasChild() == false) //process does NOT have a child
     {
-        //what do you do if process does not have a child? do u go to the end of the ready queue or start using cpu? 
-        //or do you let readyQueue.front use the cpu no?
-
-        //do we do cascading termination?
-        //erase from ram along with all its children
-        //cascadeTerminate(currRunningProcess);
-
-        //if process does not have a child it doesnt need to wait for anything and goes back to the ready queue but for now just
-        return;
+        return; //just return?
     }
 
-    else if ((currRunningProcess.hasChild() == true) && (currRunningProcess.getState() != Process::State::Waiting)) //process DOES have a child and did NOT call wait
+    //note to self - use either of the below else if statements
+    //else if ((currRunningProcess.hasChild() == true) && (currRunningProcess.getState() != Process::State::Waiting)) //process DOES have a child and did NOT call wait
+    else if (currRunningProcess.getChild().getState() == Process::State::Zombie)  //process DOES have a child and did NOT call wait aka its child is a ZOMBIE
     {
-        //instead of the else if above should i do this to directly know if the child is a zombie or not
-        // else if (currRunningProcess.getChild().getState() == Process::State::Zombie)
-        // { }
-
-        //if you are here, process has a child and is not waiting so process has a zombie child
-        //in this case, process keeps using the cpu 
-
+        //if you are here, process has a child and is not waiting so process has a zombie child - in this case, process keeps using the cpu
         currRunningProcess.setState(Process::State::Running);
 
         //erase from ram along with all its children
         cascadeTerminate(currRunningProcess);
     }
 
-    //how do u implement this line:
-    //if more than one zombie child exists process uses any of them to immediately resume parent while other zombies keep waiting for next wait from parent
+    //this part deals with finding a zombie child 
+    bool foundZombie = false;
+    Process zombieChild;
+    
+    for (auto& child : currRunningProcess.getChildren())  //getChildren returns a list or vector of child processes, auto for type, range based loop goes over all children in getchildren vector from process class
+    {
+        if (currRunningProcess.getChild().getState() == Process::State::Zombie)
+        {
+            foundZombie = true;
+            zombieChild = currRunningProcess.getChild();
+            break;
+        }
+    }
+
+    //if you did find a zombie child
+    if (foundZombie == true)
+    {
+        //change the state of child to zombie and then return so parent process keeps using the cpu
+        currRunningProcess.getChild().setState(Process::State::Zombie);
+        return;
+    }
+
+    //if ur here, no zombie children have been found so process state is waiting
+    currRunningProcess.setState(Process::State::Waiting);
+    
+    //round robin scheduling
+    currRunningProcess = Process(); //turn into default process to indicate no process currently running, cpu is idle
+
+    if (GetReadyQueueSize() != 0) 
+    {
+        // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this because process is terminated, no need to go back to ready queue
+        currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
+        currRunningProcess.setState(Process::State::Running); //now this is running the cpu
+        readyQueue.pop_front(); //remove the process in the front now because irs running the cpu now
+    }
 }
 
 void SimOS::TimerInterrupt()
@@ -166,7 +210,7 @@ void SimOS::TimerInterrupt()
         throw std::logic_error("No process currently running so timer interrupt can't signal time slice to be over");
     }
     
-    if (GetReadyQueueSize() != 0) 
+    if (GetReadyQueueSize() != 0) //round robin scheduling
     {
         readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue
         currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
@@ -230,9 +274,49 @@ void SimOS::DiskJobCompleted(int diskNumber)
     }
 }
 
+//Currently running process wants to access the specified logical memory address. 
+//System makes sure the corresponding page is loaded in the RAM. 
+//If the corresponding page is already in the RAM, its “recently used” information is updated.
+
+//if page is not in memory, it loads it and if its full, it replaces the leased recently used page with it
 void SimOS::AccessMemoryAddress(unsigned long long address)
 {
+    if (GetCPU() == NO_PROCESS) 
+    {
+        throw std::logic_error("No process currently running so cannot access memory");
+    }
+
+    unsigned long long pageNumber = address / pageSize; //get page number
     
+    int pid = currRunningProcess.getPID(); //get pid
+
+    //we need to check if the page is already in memory
+    bool pageFound = false;
+    for (auto it = memory.begin(); it != memory.end(); ++it) 
+    {
+        if (it->pageNumber == pageNumber && it->PID == pid) //if the iterator's pagenumber and pid matches ours then enter
+        {
+            pageFound = true; //if ur here we found the page so first set it to true
+            
+            MemoryItem item = *it; //create a copy of the memory item, store it in "item"
+            
+            memory.erase(it); //remove it from its current position
+            
+            memory.push_back(item); //push it in the back -- this is basically updating the recently used info as the most recent page is always pushed back, aka move to the end
+            
+            break;
+        }
+    }
+
+    if (pageFound == false) //if the page was not found enter this
+    {
+        //now we have to load it but first
+        if (memory.size() == totalFrames) //if memory is full enter this
+        {
+            memory.erase(memory.begin()); //remove the not recently used frame -- the least recent frame
+        }
+        memory.push_back({pageNumber, nextFrameNumber++, pid}); //load it
+    }
 }
 
 //returns the PID process currently using the CPU which is in the currRunningProcess vairable. If CPU is idle returns NO_PROCESS
@@ -260,7 +344,7 @@ std::deque<int> SimOS::GetReadyQueue()
 
 MemoryUsage SimOS::GetMemory()
 {
-    
+    return memory;
 }
 
 FileReadRequest SimOS::GetDisk(int diskNumber)

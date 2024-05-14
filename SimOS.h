@@ -95,6 +95,10 @@ class SimOS
         
         unsigned long long amountOfRAM; //included this for constructor param
         unsigned int pageSize; //included this for constructor param
+        
+        unsigned long long totalFrames;
+        MemoryUsage memory;
+        unsigned long long nextFrameNumber = 0;
 
         std::vector<Disk> diskQueue; //disk vector
 

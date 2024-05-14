@@ -24,6 +24,8 @@ class Process
 
         Process getChild() const;
 
+        std::vector<Process*>& getChildren();
+
         void setPID(int PID);
         
         void setState(State NewState);
@@ -41,7 +43,7 @@ class Process
         State state = State::New;
         Process* parent = nullptr;
         Process* child = nullptr;
-        std::vector<Process> childrenProcesses; //for forking, all child will be in each process vector
+        std::vector<Process*> childrenProcesses; //for forking, all child will be in each process vector
 }; 
 
 #endif

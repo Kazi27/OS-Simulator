@@ -38,6 +38,11 @@ Process Process::getChild() const
     return *child; 
 }
 
+std::vector<Process*>& Process::getChildren()
+{
+    return childrenProcesses;
+}
+
 void Process::setPID(int PID) 
 { 
     pid = PID; 

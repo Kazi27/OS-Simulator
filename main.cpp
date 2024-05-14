@@ -136,28 +136,28 @@ int main()
 		std::cout << "Test on the line 82 fails!" << std::endl;
 	}
 
-	// sim.AccessMemoryAddress(140);
-	// MemoryUsage ram{ sim.GetMemory() };
-	// if (ram[0].pageNumber != 14 || ram[0].PID != 1)
-	// {
-	// 	allTestsClean = false;
-	// 	std::cout << "Test on the line 90 fails!" << std::endl;
-	// }
+	sim.AccessMemoryAddress(140);
+	MemoryUsage ram{ sim.GetMemory() };
+	if (ram[0].pageNumber != 14 || ram[0].PID != 1)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 90 fails!" << std::endl;
+	}
 
-	// sim.SimWait();
-	// if (sim.GetCPU() != 1)
-	// {
-	// 	allTestsClean = false;
-	// 	std::cout << "Test on the line 97 fails!" << std::endl;
-	// }
+	sim.SimWait();
+	if (sim.GetCPU() != 1)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 97 fails!" << std::endl;
+	}
 
-	// sim.SimExit();
-	// ram = sim.GetMemory();
-	// if (sim.GetCPU() != NO_PROCESS || ram.size() != 0)
-	// {
-	// 	allTestsClean = false;
-	// 	std::cout << "Test on the line 105 fails!" << std::endl;
-	// }
+	sim.SimExit();
+	ram = sim.GetMemory();
+	if (sim.GetCPU() != NO_PROCESS || ram.size() != 0)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 105 fails!" << std::endl;
+	}
 
 	if (allTestsClean)
 		std::cout << "These preliminary tests are passed" << std::endl;
