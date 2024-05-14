@@ -349,11 +349,21 @@ MemoryUsage SimOS::GetMemory()
 
 FileReadRequest SimOS::GetDisk(int diskNumber)
 {
+    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    {
+        throw std::out_of_range("Invalid disk number so can't read disk"); //change from logic error to out of range error as per specs
+    }
+
     return diskQueue[diskNumber].getCurrReq();
 }
 
 std::deque<FileReadRequest> SimOS::GetDiskQueue(int diskNumber)
 {
+    if ((diskNumber > numberOfDisks) || (diskNumber < 0))
+    {
+        throw std::out_of_range("Invalid disk number so can't read disk"); //change from logic error to out of range error as per specs
+    }
+    
     return diskQueue[diskNumber].getDiskReadQueue();
 }
 
