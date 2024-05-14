@@ -67,26 +67,28 @@ void Process::setChild(Process Child)
 
 bool Process::hasParent() const //simexit
 { 
-    if (parent == nullptr)
-    {
-        return false;
-    } 
+    // if (parent == nullptr)
+    // {
+    //     return false;
+    // } 
 
-    if (parent != nullptr)
-    {
-        return true;
-    } 
+    // if (parent != nullptr)
+    // {
+    //     return true;
+    // } 
+    return parent != nullptr;
 }
 
 bool Process::hasChild() const //simwait
 { 
-    if (child == nullptr)
-    {
-        return false;
-    } 
+    // if (child == nullptr)
+    // {
+    //     return false;
+    // } 
 
-    if (child != nullptr)
-    {
-        return true;
-    } 
+    // if (child != nullptr)
+    // {
+    //     return true;
+    // } 
+    return child != nullptr;
 }
