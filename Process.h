@@ -4,6 +4,7 @@
 #define PROCESS_H
 
 #include <iostream>
+#include <vector>
 
 class Process 
 {    
