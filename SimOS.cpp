@@ -231,7 +231,7 @@ void SimOS::DiskReadRequest(int diskNumber, std::string fileName)
 
     if ((diskNumber > numberOfDisks) || (diskNumber < 0))
     {
-        throw std::logic_error("Invalid disk number so can't read disk");
+        throw std::out_of_range("Invalid disk number so can't read disk"); //change from logic error to out of range error as per specs
     }
 
     FileReadRequest readRequest = {currRunningProcess.getPID(), fileName};
@@ -254,7 +254,7 @@ void SimOS::DiskJobCompleted(int diskNumber)
 {
     if ((diskNumber > numberOfDisks) || (diskNumber < 0))
     {
-        throw std::logic_error("Invalid disk number so can't complete disk job");
+        throw std::out_of_range("Invalid disk number so can't complete disk job"); //change from logic error to out of range error as per specs
     }
 
     Process completedProcess = diskQueue[diskNumber].currProcessReading(); //curr process read gives the process reading the disk rn
