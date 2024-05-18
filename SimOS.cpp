@@ -265,7 +265,7 @@ void SimOS::DiskJobCompleted(int diskNumber)
     diskQueue[diskNumber].setNextRequest(); //set next request for the disk
 
     //resume round robin scheduling
-    if (!readyQueue.empty()) 
+    if (GetCPU() == NO_PROCESS) 
     {
         // readyQueue.push_back(currRunningProcess); //current process goes to the end of the queue -- we don't do this (?)
         currRunningProcess = readyQueue.front(); //now the new front of the ready queue is the running process
