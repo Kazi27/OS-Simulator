@@ -1,19 +1,19 @@
 # OS-Simulator
 ## A Comprehensive Operating System Simulation
 
-### This project implements a comprehensive operating system (OS) simulation designed to provide a hands-on learning experience for students and developers exploring the internal workings of an OS. It simulates essential functionalities, including:
+### This project implements a comprehensive operating system (OS) simulation designed to simulate the internal workings of an OS. It simulates essential functionalities, including:
 
 - CPU Scheduling
-  - Round-Robin scheduling ensures fair CPU allocation among processes.
+  - Round-robin scheduling ensures fair CPU allocation among processes. Each process has a time limit for how long it can use the CPU at once. If a process uses the CPU for a longer time, it goes back to the end of the ready-queue.
 - Memory Management
-  - Paging with Least Recently Used (LRU) page replacement efficiently utilizes memory resources.
+  - Paging with Least Recently Used page replacement efficiently utilizes memory resources. If the memory is full, the least recently used frame is removed from memory.
 - Disk Management
-  - First-Come, First-Served (FCFS) queues model disk I/O requests.
+  - File read requests and disk job requests are completed via a first-come, first-served model and so is the I/O queue.
+- Process Management
+  - You can create, fork, exit, or call wait on processes and make child/parent processes. Processes are terminated via cascading termination as well.
 
-### Key Features:
-- Realistic Scheduling and Management
-  - The simulation closely reflects real-world OS behavior, enabling you to observe and analyze scheduling algorithms, memory allocation, and disk I/O operations.
-- Customizable Parameters
-  - Experiment with different configurations for CPU time slices, memory page sizes, and the number of disks to tailor the simulation to your specific exploration goals.
-- Extensive API
-  - The provided SimOS class offers a comprehensive set of methods for creating, managing, and interacting with processes, memory, disks, and CPU usage.
+ ### Testing it out for yourself:
+ - The repository contains `main1.cpp` which allows you to input your own number of disks, processes, RAM and more to understand what the OS is doing. 
+ - To run `main1.cpp` please clone the repository and paste the following commands into your terminal:
+#### `g++ -std=c++17 simos.cpp disk.cpp process.cpp main1.cpp -o main1`
+#### `./main1`
