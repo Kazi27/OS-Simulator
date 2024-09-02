@@ -12,6 +12,12 @@
 - Process Management
   - You can create, fork, exit, or call wait on processes and make child/parent processes. Processes are terminated via cascading termination as well.
 
+### Demo
+
+
+https://github.com/user-attachments/assets/c940bd5b-b546-4260-af7b-32ee4ec091c9
+
+
  ### Testing it out for yourself:
  - The repository contains `main1.cpp` which allows you to input your own number of disks, processes, RAM and more to understand what the OS is doing. 
  - To run `main1.cpp` please clone the repository and paste the following commands into your terminal:
